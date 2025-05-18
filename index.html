@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Rulu LINE Share</title>
+    <style>
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #1e1e1e;
+    color: #f0f0f0;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+.container {
+    background-color: #2c2c2c;
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    text-align: center;
+}
+
+input[type="text"],
+input[type="number"],
+button {
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    border: none;
+    font-size: 18px;
+}
+
+input[type="text"],
+input[type="number"] {
+    width: 300px;
+    background-color: #3b3b3b;
+    color: #e0e0e0;
+}
+
+input::placeholder {
+    color: #777;
+}
+
+button {
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+#redirectInterval {
+    width: 200px;
+}
+
+#randomIdLength {
+    width: 200px;
+}
+
+#startRedirectButton {
+    background-color: #28a745;
+}
+
+#startRedirectButton:hover {
+    background-color: #1e7e34;
+}
+
+#stopRedirectButton {
+    background-color: #dc3545;
+}
+
+#stopRedirectButton:hover {
+    background-color: #c82333;
+}
+    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="content-type" charset="UTF-8">
+</head>
+<body>
+    <div class="container">
+        <h1>Rulu LINE Share</h1>
+        <input type="text" id="message" placeholder="共有したいメッセージ">
+        <input type="number" id="redirectInterval" placeholder="共有の間隔（ミリ秒）">
+        <input type="number" id="randomIdLength" placeholder="乱数の長さ（10以上）">
+        <button id="startRedirectButton">開始</button>
+        <button id="stopRedirectButton">停止</button>
+    </div>
+
+    <script>
+        let redirectTimer;
+
+        function generateRandomId(length) {
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += characters.charAt(Math.floor(Math.random() * characters.length));
+            }
+            return result;
+        }
+
+        document.getElementById("startRedirectButton").addEventListener("click", function() {
+            const message = document.getElementById("message").value;
+            const redirectInterval = parseInt(document.getElementById("redirectInterval").value);
+            const randomIdLength = parseInt(document.getElementById("randomIdLength").value);
+
+            if (message && redirectInterval > 0 && randomIdLength >= 10) {
+                redirectTimer = setInterval(function() {
+                    const randomId = generateRandomId(randomIdLength);
+                    const shareText = `${message} | ${randomId} | Rulu`;
+                    const encodedShareText = encodeURIComponent(shareText);
+                    const shareUrl = `line://share?text=${encodedShareText}`;
+                    window.location.href = shareUrl;
+                }, redirectInterval);
+                alert("自動共有を開始しました。");
+            } else if (randomIdLength < 10) {
+                alert("乱数の長さは10以上の数値を入力してください。");
+            } else {
+                alert("メッセージ、共有間隔、乱数の長さを正しく入力してください。");
+            }
+        });
+
+        document.getElementById("stopRedirectButton").addEventListener("click", function() {
+            clearInterval(redirectTimer);
+            alert("共有を停止しました。");
+        });
+    </script>
+</body>
+</html>
